@@ -87,6 +87,6 @@ def score(a1, a2, verbose=False):
 
 
 if __name__ == "__main__":
-    agent1 = CounterAgent()
+    agent1 = CommandLineAgent()
     agent2 = CounterAgent()
     runner(agent1, agent2, 5, verbose=True)

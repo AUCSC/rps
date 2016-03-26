@@ -1,5 +1,6 @@
 import random
 from enum import IntEnum
+from contextlib import suppress
 
 class Action(IntEnum):
     ROCK = 0
@@ -9,6 +10,12 @@ class Action(IntEnum):
     r = 0
     p = 1
     s = 2
+    R = 0
+    P = 1
+    S = 2
+    rock = 0
+    paper = 1
+    scissors = 2
 
 class RPSAgent():
     """
@@ -58,7 +65,13 @@ class CommandLineAgent(RPSAgent):
             choice = input("Select action {}: ".format(self.actions))
             try:
                 choice = Action[choice]
-            except ValueError:
+            except KeyError:
+                # one last try
+                with suppress(ValueError):
+                    choice = Action(int(choice))
+                    return choice
+                
+                # okay, this is not a choice
                 print("{} is not a valid action".format(choice))
                 choice = None
         return choice
