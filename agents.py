@@ -11,7 +11,6 @@ verbs = {(0, 1): "covered by",
          (2, 1): "cuts"}
 
 
-
 def score(a1, a2, verbose=False):
     """
     Return the score for a rock-paper-scissors game.
