@@ -2,6 +2,57 @@ import random
 from enum import IntEnum
 from contextlib import suppress
 
+
+verbs = {(0, 1): "covered by",
+         (0, 2): "smashes",
+         (1, 0): "covers",
+         (1, 2): "cut by",
+         (2, 0): "smashed by",
+         (2, 1): "cuts"}
+
+
+
+def score(a1, a2, verbose=False):
+    """
+    Return the score for a rock-paper-scissors game.
+    If verbose, display a message
+    
+    >>> score(Action.r, Action.r)
+    0
+    >>> score(Action.r, Action.r, verbose=True)
+    ROCK ties ROCK: No win!
+    0
+    >>> score(Action.p, Action.r, True)
+    PAPER covers ROCK: Player 1 wins!
+    1
+    >>> score(Action.s, Action.r, True)
+    SCISSORS smashed by ROCK: Player 2 wins!
+    -1
+    >>> score(0, 1)
+    -1
+    """
+    result = 0
+    if a1 == a2:
+        if verbose:
+            print("{} ties {}: No win!".format(a1.name, a2.name))
+        return result
+
+    # if parity is the same, lower value wins
+    if a1 % 2 == a2 % 2:
+        result = 1 if a1 < a2 else -1
+    else:     # if parity is different, higher value wins
+        result = 1 if a1 > a2 else -1
+        
+    if verbose:
+        winner = 1 if result > 0 else 2
+        print("{} {} {}: Player {} wins!".format(a1.name,
+                                                 verbs[(a1, a2)],
+                                                 a2.name, 
+                                                 winner))
+    return result
+          
+
+
 class Action(IntEnum):
     ROCK = 0
     PAPER = 1
@@ -115,6 +166,36 @@ class MirrorAgent(RPSAgent):
 
     def react(self, response):
         self.action = response
+
+
+class ScaredyAgent(RPSAgent):
+    """
+    Randomly chooses a first action, then keep doing it as long as it wins, otherwise 
+    randomly switch to one of the other two.
+    """
+    def __init__(self):
+        self.action = random.choice(list(Action))
+    
+    def act(self):
+        return self.action
+    
+    def react(self, response):
+        result = score(self.action, response)
+
+        # if we won, keep doing the same thing.
+        if result > 0:
+            return
+        # otherwise we need to choose a new action
+        options = list(Action)
+        
+        # if we tied, randomly choose from everything
+        if result == 0:
+            self.action = random.choice(options)
+        else: # choose anything but what you just did
+            options.remove(self.action)
+            self.action = random.choice(options)
+            
+        
 
 class CounterAgent(RPSAgent):
     """
