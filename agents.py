@@ -104,8 +104,10 @@ class CommandLineAgent(RPSAgent):
     Allows humans to play in the bot tournaments. Prompts user for action 
     selection at each round. Does not cheat.
     """
-    def __init__(self, actions="[r]ock, [p]aper, [s]cissors"):
+    def __init__(self, actions="[r]ock, [p]aper, [s]cissors", name=None):
         self.actions = actions
+        self.name = name
+        self.choice = None
         pass
 
         
@@ -119,12 +121,17 @@ class CommandLineAgent(RPSAgent):
                 # one last try
                 with suppress(ValueError):
                     choice = Action(int(choice))
+                    self.choice = choice
                     return choice
                 
                 # okay, this is not a choice
                 print("{} is not a valid action".format(choice))
                 choice = None
+        self.choice = choice
         return choice
+    
+    def react(self, response):
+        score(self.choice, response, verbose=True)
 
     
 class StubbornAgent(RPSAgent):

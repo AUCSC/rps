@@ -8,6 +8,7 @@ import os
 from pandas import DataFrame
 import pandas as pd
 from itertools import combinations_with_replacement
+import time
 
 import agents # import default agent library
 # import tournament agent libraries
@@ -128,7 +129,39 @@ def run_all_agents(agents, redo=False, num_games=num_games):
         seed = random.getrandbits(8)
     print("DONE MATCHES")
         
-        
+
+def random_opponent(agents, num_games=15, seed=None):
+    """
+    Randomly select an opponent from the agents list and (without telling)
+    set up a Command-Line Match with num_games rounds.
+    """
+    name = input("Enter your name:")
+    # set up match
+    if seed is None:
+        seed = int(time.mktime(datetime.now().timetuple()))
+
+    random.seed(seed)
+
+    player1 = random.choice(agents)()
+    player2 = CommandLineAgent(name=name)
+
+    (w1, w2) = runner(player1, player2, num_trials=num_games, verbose=False)
+    winner = None
+    if w1 > w2:
+        winner = str(player1)
+    elif w2 > w1:
+        winner = name
+    if winner:
+        print("Tournament final: {}-{} with a win for {}".format(w1, w2, winner))
+    else:
+        print("Tournament ends with a {}-{} draw!".format(w1, w2))        
+    
+    if(save_results(player1, "CommandLine."+name, w1, w2, num_games, seed)):
+        print("Recording for posterity!")
+    else:
+        print("Recording fail.")
+     
 
 if __name__ == "__main__":
-    run_all_agents(agents[:1], redo=True)
+    #run_all_agents(agents[:1], redo=True)
+    random_opponent(agents)
