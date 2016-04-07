@@ -16,7 +16,11 @@ import agents # import default agent library
 # TODO: dynamically load agents
 # specify the agents to actually run in the tournament
 agents = [NashAgent, StubbornAgent, 
-          MirrorAgent, CounterAgent, ScaredyAgent]
+          MirrorAgent, CounterAgent, ScaredyAgent,
+          BryanDualMarkovAgent1, BryanSelfMarkovAgent2,
+          BryanMarkovAgent2, BryanSelfMarkovAgent1, BryanMarkovAgent1]
+
+
 
 num_games = 1000000
 time_limit = 36000 # ten minutes per match NOT IMPLEMENTED
@@ -130,20 +134,38 @@ def run_all_agents(agents, redo=False, num_games=num_games):
     print("DONE MATCHES")
         
 
-def random_opponent(agents, num_games=15, seed=None):
+def human_vs_bots(agents, num_games=15, seed=None):
     """
     Randomly select an opponent from the agents list and (without telling)
     set up a Command-Line Match with num_games rounds.
     """
-    name = input("Enter your name:")
+    name = input("Enter your name: ")
+    player1 = CommandLineAgent(name=name)
+    print(name, "is Player 1")
+    
+    player2 = None
+    while not player2:
+        bot = input("Enter an opponent (empty for random): ")    
+        if not bot:
+            player2 = random.choice(agents)()
+            print("Player 2 is a surprise!")
+        else:
+            poss = [a for a in agents if bot.lower() in a._name().lower()]
+            if len(poss) == 0:
+                print("Sorry, I did not recognize that bot.")
+            elif len(poss) == 1:
+                player2 = poss[0]()
+                print(str(player2), "is Player 2")
+            else:
+                print("You need to be more specific. Did you mean:")
+                for a in poss:
+                    print(a._name())
+        
     # set up match
     if seed is None:
         seed = int(time.mktime(datetime.now().timetuple()))
 
     random.seed(seed)
-
-    player1 = random.choice(agents)()
-    player2 = CommandLineAgent(name=name)
 
     (w1, w2) = runner(player1, player2, num_trials=num_games, verbose=False)
     winner = None
@@ -163,5 +185,5 @@ def random_opponent(agents, num_games=15, seed=None):
      
 
 if __name__ == "__main__":
-    #run_all_agents(agents[:1], redo=True)
-    random_opponent(agents)
+    #run_all_agents(agents, redo=True)
+    human_vs_bots(agents)

@@ -97,6 +97,13 @@ class RPSAgent():
         Return a nicely formatted name
         """
         return self.__class__.__name__
+    
+    @classmethod
+    def _name(cls):
+        """
+        Convenience for logging
+        """
+        return cls.__name__
           
     
 class CommandLineAgent(RPSAgent):
@@ -233,7 +240,11 @@ class SelfCounterAgent(RPSAgent):
         response = (self.action + 1) % len(Action)
         self.action = Action(response)
     
-       
+  
+##########################################
+## STUDENT AGENTS
+##########################################
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
